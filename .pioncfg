@@ -1,0 +1,4 @@
+[map]
+dist=admin_ui
+[only]
+dist

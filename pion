@@ -1,0 +1,11 @@
+<?php
+
+define('ROOT', __DIR__.'/');
+
+spl_autoload_register(function($class){
+    require_once __DIR__.'/saad/'.str_replace('\\', '/', $class).'.php';
+});
+use Pion\Pion;
+
+array_shift($argv);
+Pion::run($argv);
