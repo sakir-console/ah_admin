@@ -163,6 +163,11 @@
                 <label class="focus-label">Category Name<span class="text-danger">*</span></label>
               </div>
 
+              <div v-if="errors.length!=0" class="alert alert-danger alert-dismissible fade show" role="alert">
+                <strong>Error!</strong>
+                <li style="text-transform: capitalize;" v-for="(error,index) in errors.fields">{{ index }}: {{ error }} </li>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+              </div>
               <div class="submit-section">
                 <button @click.prevent="addCat()" type="submit" class="btn btn-primary btn-save">Save Changes</button>
               </div>
@@ -182,7 +187,9 @@
 export default {
 name: "BlogCats",
   data() {
+
     return {
+      errors:[],
       page: 1,
       id: '',
       title: '',
@@ -211,6 +218,7 @@ name: "BlogCats",
         if (response.data.success == true) {
           this.toast(response.data.message, "", "success")
         } else {
+          this.errors=response.data
           this.toast(response.data.error, "", "danger")
         }
 

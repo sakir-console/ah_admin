@@ -33,7 +33,7 @@ import { computed, ref, onMounted, onUnmounted, watch } from 'vue'
 import { useGeolocation } from '@/useGeolocation'
 import { Loader } from '@googlemaps/js-api-loader'
 
-const GOOGLE_MAPS_API_KEY = 'AIzaSyBhXcPhdX4pNua2-uUobrlCdvMJ0dDHguw'
+const GOOGLE_MAPS_API_KEY = 'AIzaSyCLU6EjlJGFYQja_P4uOnP7o9vrKKDSqog'
 
 export default {
   name: "Map",

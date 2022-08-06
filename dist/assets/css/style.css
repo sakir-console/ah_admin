@@ -4066,7 +4066,7 @@ html.menu-opened body {
 	transform-origin: left top;
 	transition: 240ms;
 	left: 12px;
-	top: -8px;
+	top: -18px;
 	z-index: 1;
 	color: #131523;
 	margin-bottom: 0;

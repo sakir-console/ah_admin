@@ -32,13 +32,19 @@
               </div>
               <div class="card-body p-0">
                 <div class="table-responsive">
+
+                  <div v-if="errors.length!=0" class="alert alert-danger alert-dismissible fade show" role="alert">
+                    <strong>Error!</strong>
+                    <li style="text-transform: capitalize;" v-for="(error,index) in errors.fields">{{ index }}: {{ error }} </li>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                  </div>
                   <table class="datatable table table-borderless hover-table" id="data-table">
                     <thead class="thead-light">
                     <tr>
                       <th>No.</th>
                       <th style="text-transform: capitalize;">Driver Name</th>
                       <th>Phone</th>
-                      <th>Area</th>
+                      <th>Verification</th>
                     </tr>
                     </thead>
                     <tbody>
@@ -48,17 +54,17 @@
                         <h2 class="table-avatar">
                           <a href="#" class="spl-img"><img :src="this.base_url+'/assets/img/icon/spec.png'" class="img-fluid"
                                                            alt="User Image"></a>
-                          <a :href="ambulance.id"><span> ambulance.name </span></a>
+                          <a :href="ambulance.id"><span> {{ ambulance.name }} </span></a>
                         </h2>
                       </td>
-                      <td>Phone</td>
-                      <td>Thana</td>
+                      <td>{{ ambulance.phones }}</td>
+                      <td>{{ ambulance.verified=='0'?'❌':' ✓' }}</td>
                       <td class="text-end">
                         <div class="actions">
 
-                          <a class="text-danger" href="" data-bs-toggle="modal"
+                          <a class="text-danger btn" href="" data-bs-toggle="modal"
                              :data-bs-target="'#dltModal'+ambulance.id">
-                            <i class="feather-trash-2 me-1"></i> Verify
+                            ✓ Verify
                           </a>
                         </div>
                       </td>
@@ -75,9 +81,9 @@
                             <div class="modal-body">
                               <form>
                                 <div class="delete-wrap text-center">
-                                  <div class="del-icon"><i class="feather-x-circle"></i></div>
+                                  <div class="del-icon"><i class="feather-info"></i></div>
                                   <h2>Sure you Want to Verify</h2>
-                                  <p> ambulance.name </p>
+                                  <p> {{ ambulance.name }} </p>
                                   <div class="submit-section">
                                     <a style="margin-right: 25px;" @click.prevent="verifyAmb(ambulance.id)"
                                        class="btn btn-success" data-bs-dismiss="modal">Yes</a>
@@ -124,6 +130,7 @@ export default {
   name: "Ambulance",
   data() {
     return {
+      errors:[],
       page: 1,
       hos:'',
       sec:'',
@@ -147,7 +154,7 @@ export default {
 
     verifyAmb(id) {
       // locations request - AH
-      this.axios.post("doctor/verify", this.pBody({
+      this.axios.post("ambulance/verify", this.pBody({
         "id": id
       })).then(response => {
         console.log((response.data))
@@ -156,6 +163,7 @@ export default {
         if (response.data.success == true) {
           this.toast(response.data.message, "", "success")
         } else {
+          this.errors=response.data
           this.toast(response.data.error, "", "danger")
         }
 

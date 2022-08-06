@@ -35,6 +35,13 @@
                 </div>
               </div>
 
+              <div v-if="errors.length!=0" class="alert alert-danger alert-dismissible fade show" role="alert">
+                <strong>Error!</strong>
+                <li style="text-transform: capitalize;" v-for="(error,index) in errors.fields">{{ index }}: {{ error }} </li>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+              </div>
+
+
               <button @click.prevent="addBlog()" type="submit" class="btn btn-primary save-btn">Save Changes</button>
             </div>
           </div>
@@ -52,6 +59,7 @@ export default {
 
   data() {
     return {
+      errors:[],
       purl: '/blog-edit?id=',
       page: 1,
       id: '',
@@ -78,7 +86,7 @@ export default {
         let formData = new FormData()
         formData.append('thumb', this.thumb)
         formData.append('title', this.title)
-        formData.append('cat', '2')
+        formData.append('cat', this.cat_opt)
         formData.append('text', this.text)
 
         this.axios.post("blog/add", formData, {
@@ -96,6 +104,7 @@ export default {
           if (response.data.success == true) {
             this.toast(response.data.message, "", "success")
           } else {
+            this.errors=response.data
             this.toast(response.data.error, "", "danger")
           }
         })
@@ -119,10 +128,10 @@ export default {
     },
     // Blog cats FETCH request - AH
     viewCats() {
-      this.axios.get("blog/cat")
+      this.axios.get("blog/cats")
           .then(response => {
             console.log((response.data))
-            this.categories = response.data
+            this.cats = response.data
           }).catch(error => {
         this.errorMessage = error.message;
         console.error("There was an error!", error);

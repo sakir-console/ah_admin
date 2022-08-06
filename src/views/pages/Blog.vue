@@ -20,20 +20,18 @@
         <div v-for="(blog,index) in blogs.data" :key="blog.id" class="col-md-6 col-xl-4 col-sm-12 d-flex">
           <div class="blog grid-blog flex-fill">
             <div class="blog-image">
-              <a href=""><img class="img-fluid" :src="blog.thumb" alt="Post Image"></a>
-              <div class="fav-btn">
-                <img :src="this.base_url+'assets/img/icon/eye-icon.png'" alt="icon"> 225
-              </div>
+              <a href=""><img class="img-fluid" :src="`https://amaderhospital.com`+blog.thumb" alt="Blog Image"></a>
+
             </div>
             <div class="blog-content">
               <ul class="entry-meta meta-item">
                 <li>
                   <div class="post-author">
-                    <a href="profile.html">
-                      <img :src="this.base_url+'assets/img/profiles/avatar-02.jpg'" alt="Post Author">
+                    <a href="">
+                      <img :src="blog.photo==''?this.base_url+'assets/img/profiles/avatar-02.jpg':`https://amaderhospital.com`+blog.photo" alt="Post Author">
                       <span>
-<span class="post-title">User Name</span>
-<span class="post-date"><i class="far fa-clock"></i> {{ blog.tstamp }}</span>
+<span class="post-title">{{ blog.name }}</span>
+<span class="post-date">@ {{ blog.username }}</span>
 </span>
                     </a>
                   </div>
@@ -111,6 +109,7 @@ export default {
   name: "Blog",
   data() {
     return {
+      errors:[],
       purl: '/blog-edit?id=',
       page: 1,
       id: '',
@@ -146,6 +145,7 @@ export default {
         if (response.data.success == true) {
           this.toast(response.data.message, "", "success")
         } else {
+          this.errors=response.data
           this.toast(response.data.error, "", "danger")
         }
 
@@ -202,7 +202,7 @@ export default {
     },
     nextPage(pg) {
       this.page = pg
-      this.viewCats()
+      this.viewBlogs()
     },
   },
   mounted() {

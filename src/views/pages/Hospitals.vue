@@ -17,19 +17,7 @@
 
                   <div class="col-auto d-flex flex-wrap">
 
-                    <div class="form-custom me-2">
-                      <div id="country" class="dataTables_wrapper">
 
-                        <select v-model="parent_con" @change="getDis(parent_con)" class="form-select">
-                          <option value="" selected>Select Country</option>
-                          <option v-for="(country,index) in countries.data" :key="country.id" :value="country.id">
-                            {{ country.name }}
-                          </option>
-                        </select>
-
-
-                      </div>
-                    </div>
 
                     <div class="form-custom me-2">
                       <div id="district" class="dataTables_wrapper">
@@ -47,7 +35,7 @@
                     <div class="form-custom me-2">
                       <div id="thana" class="dataTables_wrapper">
 
-                        <select v-model="parent_tha" @change="selTha()" class="form-select">
+                        <select v-model="parent_tha" @change="hospitalView()" class="form-select">
                           <option value="" selected>Select Thana</option>
                           <option v-for="(thana,index) in thanas.data" :key="thana.id" :value="thana.id">
                             {{ thana.name }}
@@ -59,7 +47,7 @@
 
                     <div class="form-custom me-2">
                       <div id="tableSearch" class="dataTables_wrapper">
-                        <div id="data-table_filter" class="dataTables_filter"><label> <input type="search"
+                        <div id="data-table_filter" class="dataTables_filter"><label> <input  @input="searchHospital" type="text" v-model="hosname"
                                                                                              class="form-control form-control-sm"
                                                                                              placeholder="Search..."
                                                                                              aria-controls="data-table"></label>
@@ -73,6 +61,9 @@
 
 
                   </div>
+
+
+
                 </div>
               </div>
               <div class="card-body p-0">
@@ -82,7 +73,7 @@
                     <tr>
                       <th>No.</th>
                       <th style="text-transform: capitalize;">Hospital Name</th>
-                      <th style="text-transform: capitalize;">Thana</th>
+                      <th style="text-transform: capitalize;">Upazila</th>
                       <th style="text-transform: capitalize;">District</th>
                       <th></th>
                     </tr>
@@ -99,16 +90,16 @@
                         </h2>
                       </td>
                       <td>
-                        {{hospital.thana}}
+                        {{hospital.thana_name}}
 
                       </td>
                       <td>
-                        {{hospital.district}}
+                        {{hospital.district_name}}
 
                       </td>
                       <td class="text-end">
                         <div class="actions">
-                          <a @click.prevent="getUData(hospital.id,hospital.name,hospital.addr,hospital.thana,hospital.lng,hospital.lat)"
+                          <a @click.prevent="getUData(parseInt(hospital.id),hospital.name,parseInt(hospital.beds),parseInt(hospital.icu),parseInt(hospital.nicu),parseInt(hospital.ccu),parseInt(hospital.dialysis),hospital.addr,parseInt(hospital.district),parseInt(hospital.thana),parseFloat(hospital.lng),parseFloat(hospital.lat))"
                              class="text-black" href="" data-bs-toggle="modal" :data-bs-target="'#edtModal'+hospital.id">
                             <i class="feather-edit-3 me-1"></i> Edit
                           </a>
@@ -172,13 +163,81 @@
                                               <input v-model="name" type="text" class="form-control">
                                             </div>
                                           </div>
+
+                                          <div class="form-group row">
+                                            <label class="col-lg-3 col-form-label">Total Beds</label>
+                                            <div class="col-lg-9">
+                                              <input v-model="beds" type="text" class="form-control">
+                                            </div>
+                                          </div>
+                                          <div class="form-group row">
+                                            <label class="col-lg-3 col-form-label">Total ICU</label>
+                                            <div class="col-lg-9">
+                                              <input v-model="icu" type="text" class="form-control">
+                                            </div>
+                                          </div>
+                                          <div class="form-group row">
+                                            <label class="col-lg-3 col-form-label">Total NICU</label>
+                                            <div class="col-lg-9">
+                                              <input v-model="nicu" type="text" class="form-control">
+                                            </div>
+                                          </div>
+                                          <div class="form-group row">
+                                            <label class="col-lg-3 col-form-label">Total CCU</label>
+                                            <div class="col-lg-9">
+                                              <input v-model="ccu" type="text" class="form-control">
+                                            </div>
+                                          </div>
+                                          <div class="form-group row">
+                                            <label class="col-lg-3 col-form-label">Dialysis</label>
+                                            <div class="col-lg-9">
+                                              <input v-model="dialysis" type="text" class="form-control">
+                                            </div>
+                                          </div>
+
+
+
+
+
+
+
+
+
+
                                           <div class="form-group row">
                                             <label class="col-lg-3 col-form-label">Hospital Address</label>
                                             <div class="col-lg-9">
                                               <input v-model="area" type="text" class="form-control">
                                             </div>
                                           </div>
+                                          <div class="form-group row">
+                                            <label class="col-lg-3 col-form-label">District</label>
+                                            <div class="col-lg-9">
+                                              <select v-model="parent_dis" @change="getTha(parent_dis)" class="form-select">
+                                                <option v-for="(district,index) in districts.data" :key="district.id"
+                                                        :value="district.id">{{ district.name }}
+                                                </option>
+                                              </select>
+                                            </div>
+                                          </div>
+                                          <div class="form-group row">
+                                            <label class="col-lg-3 col-form-label">Upazila</label>
+                                            <div class="col-lg-9">
+                                              <select v-model="parent_tha" class="form-select">
+                                                <option v-for="(thana,index) in thanas.data" :key="thana.id" :value="thana.id">
+                                                  {{ thana.name }}
+                                                </option>
+                                              </select>
+                                            </div>
+                                          </div>
 
+
+
+                                          <div v-if="errors.length!=0" class="alert alert-danger alert-dismissible fade show" role="alert">
+                                            <strong>Error!</strong>
+                                            <li style="text-transform: capitalize;" v-for="(error,index) in errors.fields">{{ index }}: {{ error }} </li>
+                                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                                          </div>
                                           <div class="text-end">
                                             <button @click.prevent="updateHos" type="submit" class="btn btn-primary">
                                               Update
@@ -255,25 +314,46 @@
                           <div class="col-lg-9">
                             <input v-model="name" type="text" class="form-control">
                           </div>
-                        </div>         <div class="form-group row">
+                        </div>
+                        <div class="form-group row">
                           <label class="col-lg-3 col-form-label">Hospital Address</label>
                           <div class="col-lg-9">
                             <input v-model="area" type="text" class="form-control">
                           </div>
                         </div>
-
-
                         <div class="form-group row">
-                          <label class="col-lg-3 col-form-label">Country</label>
+                          <label class="col-lg-3 col-form-label">Total Beds</label>
                           <div class="col-lg-9">
-                            <select v-model="parent_con" @change="getDis(parent_con)" class="form-select">
-
-                              <option v-for="(country,index) in countries.data" :key="country.id" :value="country.id">
-                                {{ country.name }}
-                              </option>
-                            </select>
+                            <input v-model="beds" type="text" class="form-control">
                           </div>
                         </div>
+                        <div class="form-group row">
+                          <label class="col-lg-3 col-form-label">Total ICU</label>
+                          <div class="col-lg-9">
+                            <input v-model="icu" type="text" class="form-control">
+                          </div>
+                        </div>
+                        <div class="form-group row">
+                          <label class="col-lg-3 col-form-label">Total NICU</label>
+                          <div class="col-lg-9">
+                            <input v-model="nicu" type="text" class="form-control">
+                          </div>
+                        </div>
+                        <div class="form-group row">
+                          <label class="col-lg-3 col-form-label">Total CCU</label>
+                          <div class="col-lg-9">
+                            <input v-model="ccu" type="text" class="form-control">
+                          </div>
+                        </div>
+                        <div class="form-group row">
+                          <label class="col-lg-3 col-form-label">Dialysis</label>
+                          <div class="col-lg-9">
+                            <input v-model="dialysis" type="text" class="form-control">
+                          </div>
+                        </div>
+
+
+
 
                         <div class="form-group row">
                           <label class="col-lg-3 col-form-label">District</label>
@@ -286,7 +366,7 @@
                           </div>
                         </div>
                         <div class="form-group row">
-                          <label class="col-lg-3 col-form-label">Thana</label>
+                          <label class="col-lg-3 col-form-label">Upazila</label>
                           <div class="col-lg-9">
                             <select v-model="parent_tha" class="form-select">
                               <option v-for="(thana,index) in thanas.data" :key="thana.id" :value="thana.id">
@@ -296,6 +376,14 @@
                           </div>
                         </div>
 
+
+
+
+                        <div v-if="errors.length!=0" class="alert alert-danger alert-dismissible fade show" role="alert">
+                          <strong>Error!</strong>
+                          <li style="text-transform: capitalize;" v-for="(error,index) in errors.fields">{{ index }}: {{ error }} </li>
+                          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
                         <div class="text-end">
                           <button @click.prevent="addHos" type="submit" class="btn btn-primary">Submit</button>
                         </div>
@@ -373,21 +461,29 @@ import {computed, ref, onMounted, onUnmounted, watch} from 'vue'
 import {useGeolocation} from '@/useGeolocation'
 import {Loader} from '@googlemaps/js-api-loader'
 
-const GOOGLE_MAPS_API_KEY = 'AIzaSyBhXcPhdX4pNua2-uUobrlCdvMJ0dDHguw'
+const GOOGLE_MAPS_API_KEY = 'AIzaSyCLU6EjlJGFYQja_P4uOnP7o9vrKKDSqog'
 export default {
   name: "Hospitals",
   components: {Map},
   data() {
     return {
+      errors:[],
       loading: false,
-      id: '',
+      id: null,
       label: 'all',
       page: 1,
       area: '',
       hospitals: [],
 
+      beds:'',
+      icu:'',
+      nicu:'',
+      ccu:'',
+      dialysis:'',
+
       add_label: 'thana',
       name: '',
+      hosname: '',
       place_lng: '',
       place_lat: '',
       sC: false,
@@ -420,6 +516,35 @@ export default {
             console.error("There was an error!", error);
           });
     },
+
+
+    searchHospital() {
+      if (this.hosname == '') {
+        this.hospitalView()
+      } else {
+        this.loading = true;
+
+        //request - AH
+        this.axios.get("hospital/search?q=" + this.hosname)
+            .then(response => {
+              this.loading = false;
+              if (response.data.data.length !== 0) {
+                this.NoData = false
+              } else {
+                this.NoData = true
+              }
+              console.log((response.data))
+              this.hospitals = response.data
+            })
+            .catch(error => {
+              this.errorMessage = error.message;
+              console.error("There was an error!", error);
+            });
+      }
+
+    },
+
+
     dltHos(id) {
       // locations request - AH
       this.axios.post("hospital/remove", this.pBody({
@@ -439,52 +564,17 @@ export default {
             console.error("There was an error!", error);
           });
     },
-    selectedLabel() {
-      switch (this.add_label) {
-        case 'country':
-          this.parent = 0
-          this.sC = true
-          this.sT = false
-          this.sD = false
-          break;
-        case 'district':
-          this.getCon()
-          this.sD = true
-          this.sC = false
-          this.sT = false
-          break;
-        case 'thana':
-          this.getCon()
-          this.sT = true
-          this.sC = false
-          this.sD = false
-          break;
-        default:
-          // code block
-      }
-    },
-    getCon() {
-      // locations request - AH
-      this.axios.get("location/get/all/country/0")
-          .then(response => {
-            console.log((response.data))
-            this.countries = response.data
-            this.getDis(this.parent)
-          })
-          .catch(error => {
-            this.errorMessage = error.message;
-            console.error("There was an error!", error);
-          });
 
 
-    },
-    getDis(con) {
+
+    getDis() {
       // locations request - AH
-      this.axios.get("location/get/" + con + "/district/0")
+      this.axios.get("location/get/" + 1 + "/district/0")
           .then(response => {
             console.log((response.data))
             this.districts = response.data
             this.getTha(this.parent)
+            this.hospitalView()
           })
           .catch(error => {
             this.errorMessage = error.message;
@@ -499,46 +589,42 @@ export default {
           .then(response => {
             console.log((response.data))
             this.thanas = response.data
+
           }).catch(error => {
-            this.errorMessage = error.message;
-            console.error("There was an error!", error);
-          });
+        this.errorMessage = error.message;
+        console.error("There was an error!", error);
+      });
 
 
     },
 
-
-    selTha(){
-          this.hospitalView()
-    },
-    getParent() {
-      if (this.add_label == 'country') {
-        return 0
-      }
-      if (this.add_label == 'district') {
-        return this.parent_con
-      }
-      if (this.add_label == 'thana') {
-        return this.parent_dis
-      }
-      return this.parent_tha
-    },
     addHos() {
 
       this.axios.post("/hospital/save", this.pBody({
         "name": this.name,
+        "icu": this.icu,
+        "nicu": this.nicu,
+        "beds": this.beds,
+        "ccu": this.ccu,
+        "dialysis": this.dialysis,
         "addr": this.area,
+
+
+
+
         "thana": this.parent_tha,
         "lat": this.otherPos.lat?.toFixed(4),
         "lng": this.otherPos.lng?.toFixed(4)
       })).then(response => {
         console.log((response.data))
         this.hospitalView()
-        $('.close-btn').click();
+
 
         if (response.data.success == true) {
+          $('.close-btn').click();
           this.toast(response.data.message, "", "success")
         } else {
+          this.errors=response.data
           this.toast(response.data.error, "", "danger")
         }
 
@@ -549,11 +635,18 @@ export default {
             console.error("There was an error!", error.message);
           });
     },
-    getUData(id, nam, addr, tha, lg, lt) {
-
-      this.id = id;
+    getUData(id, nam,beds,icu,nicu,ccu,dialysis, addr,dis, tha, lg, lt) {
+       console.log(id)
+      this.id = id
       this.name = nam
+      this.beds = beds
+      this.icu = icu
+      this.nicu = nicu
+      this.ccu = ccu
+      this.dialysis = dialysis
       this.area = addr
+
+     // this.parent_dis = dis
       this.parent_tha = tha
       this.place_lng = lg
       this.place_lat = lt
@@ -564,8 +657,15 @@ export default {
       this.axios.post("/hospital/save", this.pBody({
         "id": this.id,
         "name": this.name,
+        "icu": this.icu,
+        "nicu": this.nicu,
+        "beds": this.beds,
+        "ccu": this.ccu,
+        "dialysis": this.dialysis,
         "addr": this.area,
-        "thana_id": this.parent_tha,
+
+
+        "thana": this.parent_tha,
         "lat": this.place_lat,
         "lng": this.place_lng
       })).then(response => {
@@ -573,10 +673,12 @@ export default {
         this.parent_con= '',
         this.parent_dis= '',
         this.hospitalView()
-        $('.close-btn').click();
+
         if (response.data.success == true) {
+          $('.close-btn').click();
           this.toast(response.data.message, "", "success")
         } else {
+          this.errors=response.data
           this.toast(response.data.error, "", "danger")
         }
 
@@ -663,7 +765,7 @@ export default {
     return {currPos, otherPos, distance, mapDiv}
   },
   mounted() {
-    this.getCon()
+    this.getDis()
     this.hospitalView()
 
   }

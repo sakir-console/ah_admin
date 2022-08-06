@@ -192,7 +192,11 @@
                             <input v-model="name" type="text" class="form-control">
                           </div>
                         </div>
-
+                        <div v-if="errors.length!=0" class="alert alert-danger alert-dismissible fade show" role="alert">
+                          <strong>Error!</strong>
+                          <li style="text-transform: capitalize;" v-for="(error,index) in errors.fields">{{ index }}: {{ error }} </li>
+                          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
                         <div class="text-end">
                           <button @click.prevent="addSpec" type="submit" class="btn btn-primary">Submit</button>
                         </div>
@@ -219,6 +223,7 @@ export default {
   name: "Specialities",
   data() {
     return {
+      errors:[],
       page: 1,
       id: '',
       name: '',
@@ -243,10 +248,12 @@ export default {
       })).then(response => {
         console.log((response.data))
         this.viewSpec()
-        $('.close-btn').click();
+
         if (response.data.success == true) {
+          $('.close-btn').click();
           this.toast(response.data.message, "", "success")
         } else {
+          this.errors=response.data
           this.toast(response.data.error, "", "danger")
         }
 
@@ -258,7 +265,7 @@ export default {
     updateSpec() {
       // locations request - AH
       this.axios.post("doctor/sector", this.pBody({
-        "sector_id": this.id,
+        "id": this.id,
         "name": this.name
       })).then(response => {
         console.log((response.data))

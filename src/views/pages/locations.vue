@@ -101,87 +101,6 @@
                         </div>
                       </div>
 
-                      <div class="modal fade contentmodal" :id="'edtModal'+place.id" tabindex="-1" aria-hidden="true">
-
-                        <div class="modal-dialog modal-dialog-centered" style="max-width: 50%">
-                          <div class="modal-content doctor-profile">
-                            <div class="modal-header">
-                              <h3 class="mb-0">Edit Location</h3>
-                              <button type="button" class="close-btn" data-bs-dismiss="modal" aria-label="Close"><i
-                                  class="feather-x-circle"></i></button>
-                            </div>
-                            <div class="modal-body">
-
-
-
-                              <div class="content container-fluid">
-
-                                <div class="row">
-                                  <div class=" d-flex">
-                                    <div class="card flex-fill">
-                                      <div class="card-header">
-                                        <h4 class="card-title">Location Info</h4>
-                                      </div>
-                                      <div class="card-body">
-                                        <form action="#">
-                                          <div class="form-group row">
-                                            <label class="col-lg-3 col-form-label">Place Name</label>
-                                            <div class="col-lg-9">
-                                              <input v-model="name" type="text" class="form-control">
-                                            </div>
-                                          </div>
-
-                                          <div class="form-group row">
-                                            <label class="col-lg-3 col-form-label">Place TYPE</label>
-                                            <div class="col-lg-9">
-                                              <select v-model="add_label" @change="selectedLabel" class="form-select">
-                                                <option selected>Location Type</option>
-                                                <option value="country">Country</option>
-                                                <option value="district">District</option>
-                                                <option value="thana">Thana</option>
-                                              </select>
-                                            </div>
-                                          </div>
-
-                                          <div v-if="sD || sT" class="form-group row">
-                                            <label class="col-lg-3 col-form-label">Country</label>
-                                            <div class="col-lg-9">
-                                              <select v-model="parent" class="form-select">
-
-                                                <option v-for="(country,index) in countries.data" :key="country.id" :value="country.id">{{country.name}}</option>
-                                              </select>
-                                            </div>
-                                          </div>
-
-                                          <div v-if="sT" class="form-group row">
-                                            <label class="col-lg-3 col-form-label">District</label>
-                                            <div class="col-lg-9">
-                                              <select v-model="parent" class="form-select">
-                                                <option v-for="(district,index) in districts.data" :key="district.id" :value="district.id">{{district.name}}</option>
-                                              </select>
-                                            </div>
-                                          </div>
-
-                                          <div class="text-end">
-                                            <button @click.prevent="updateLoc" type="submit" class="btn btn-primary">Update</button>
-                                          </div>
-                                        </form>
-                                      </div>
-                                    </div>
-                                  </div>
-
-                                </div>
-
-
-
-                              </div>
-
-
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-
 
 
                     </tr>
@@ -266,7 +185,11 @@
                                 </select>
                               </div>
                             </div>
-
+                            <div v-if="errors.length!=0" class="alert alert-danger alert-dismissible fade show" role="alert">
+                              <strong>Error!</strong>
+                              <li style="text-transform: capitalize;" v-for="(error,index) in errors.fields">{{ index }}: {{ error }} </li>
+                              <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                            </div>
                             <div class="text-end">
                               <button @click.prevent="addLoc" type="submit" class="btn btn-primary">Submit</button>
                             </div>
@@ -331,12 +254,13 @@ import { computed, ref, onMounted, onUnmounted, watch } from 'vue'
 import { useGeolocation } from '@/useGeolocation'
 import { Loader } from '@googlemaps/js-api-loader'
 
-const GOOGLE_MAPS_API_KEY = 'AIzaSyBhXcPhdX4pNua2-uUobrlCdvMJ0dDHguw'
+const GOOGLE_MAPS_API_KEY = 'AIzaSyCLU6EjlJGFYQja_P4uOnP7o9vrKKDSqog'
 export default {
   name: "locations",
   components: {Map},
   data() {
     return {
+      errors:[],
       id:'',
       label: 'all',
       page: 1,
@@ -483,12 +407,16 @@ export default {
       })).then(response => {
             console.log((response.data))
             this.locations()
-            $('.close-btn').click();
+
 
             if(response.data.success==true)
-            {this.toast(response.data.message,"","success")
+            {   $('.close-btn').click();
+              this.toast(response.data.message,"","success")
             }else
-              {this.toast(response.data.error,"","danger")}
+              {
+
+                this.errors=response.data
+                this.toast(response.data.error,"","danger")}
 
           })
           .catch(error => {
@@ -519,10 +447,13 @@ export default {
       })).then(response => {
             console.log((response.data))
             this.locations()
-            $('.close-btn').click();
+
             if(response.data.success==true)
-            {this.toast(response.data.message,"","success")
-            }else{this.toast(response.data.error,"","danger")}
+            {  $('.close-btn').click();
+              this.toast(response.data.message,"","success")
+            }else{
+              this.errors=response.data
+              this.toast(response.data.error,"","danger")}
 
           })
           .catch(error => {

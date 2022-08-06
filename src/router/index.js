@@ -16,6 +16,7 @@ import BlogCats from "@/views/pages/BlogCats";
 import BlogAdd from "@/views/pages/BlogAdd";
 import BlogEdit from "@/views/pages/BlogEdit";
 import login from "@/views/pages/login";
+import addTopDOc from "@/views/pages/addTopDOc";
 
 const routes = [
   {
@@ -73,12 +74,17 @@ const routes = [
     component: BlogCats
   },
   {
+    path: '/topDoc-add',
+    name: 'TDAdd',
+    component: addTopDOc
+  },
+  {
     path: '/blog-add',
     name: 'blogAdd',
     component: BlogAdd
   },
   {
-    path: '/health-edit',
+    path: '/blog-edit',
     name: 'blogEdit',
     component: BlogEdit
   },
